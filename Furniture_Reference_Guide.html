@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Move-Out Collection</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF3366;
+            --secondary: #00C2A8;
+            --dark: #0A192F;
+            --light: #F4F7F6;
+            --white: #FFFFFF;
+            --gray: #888888;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 80px;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        nav h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            color: var(--dark);
+            font-family: 'Georgia', serif;
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 15px 10px 35px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        /* Categories Bar */
+        .categories {
+            display: flex;
+            gap: 15px;
+            padding: 20px 30px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .cat-btn {
+            background: var(--white);
+            border: 2px solid transparent;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--dark);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cat-btn.active, .cat-btn:hover {
+            border-color: var(--secondary);
+            color: var(--secondary);
+        }
+
+        /* Catalog Grid */
+        .catalog {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            padding: 0 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.04);
+            border-top: 5px solid var(--secondary);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-img-placeholder {
+            height: 200px;
+            background-color: #EAEAEA;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            font-size: 3rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            margin: 0 0 10px 0;
+            font-size: 1.25rem;
+            line-height: 1.3;
+        }
+
+        .card-retail {
+            text-decoration: line-through;
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+
+        .card-price {
+            font-size: 1.4rem;
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #555;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .add-btn {
+            background-color: var(--light);
+            color: var(--dark);
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .add-btn.added {
+            background-color: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        /* Bottom Price Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: var(--dark);
+            color: var(--white);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.1);
+        }
+
+        .bottom-bar .total-label {
+            font-size: 1.2rem;
+        }
+
+        .bottom-bar .total-amount {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #FFE66D;
+        }
+
+        /* Responsive */
+        @media(max-width: 768px) {
+            nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            .search-container {
+                width: 100%;
+            }
+            .catalog {
+                padding: 0 15px;
+            }
+            .categories {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h1>The Move-Out Collection</h1>
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search furniture...">
+        </div>
+    </nav>
+
+    <div class="categories" id="categoryFilter">
+        <button class="cat-btn active" data-category="all"><i class="fas fa-layer-group"></i> All Items</button>
+        <button class="cat-btn" data-category="living"><i class="fas fa-couch"></i> Living Room</button>
+        <button class="cat-btn" data-category="bedroom"><i class="fas fa-bed"></i> Bedroom</button>
+        <button class="cat-btn" data-category="storage"><i class="fas fa-box"></i> Storage</button>
+        <button class="cat-btn" data-category="dining"><i class="fas fa-chair"></i> Dining/Bar</button>
+        <button class="cat-btn" data-category="outdoor"><i class="fas fa-sun"></i> Outdoor</button>
+    </div>
+
+    <div class="catalog" id="catalog">
+        <!-- Items will be injected here by JS -->
+    </div>
+
+    <div class="bottom-bar">
+        <div class="total-label">Estimated Cart Total:</div>
+        <div class="total-amount">$<span id="totalPrice">0</span></div>
+    </div>
+
+    <script>
+        const furnitureData = [
+            { id: 1, title: "STUNNING Flexsteel Power Loveseat", desc: "Power Headrest & Lumbar with center console.", retail: 2600, price: 850, category: "living", icon: "fa-couch" },
+            { id: 2, title: "Mid-Century Sofa (Article Ceni)", desc: "Versatile beige upholstery. Excellent condition.", retail: 1100, price: 500, category: "living", icon: "fa-couch" },
+            { id: 3, title: "Sleek Minimalist 4-Drawer Dresser", desc: "IKEA MALM. Offers massive storage without eating up floor space.", retail: 129, price: 80, category: "storage", icon: "fa-box" },
+            { id: 4, title: "Executive Style Bed Frame", desc: "IKEA MALM Oak Veneer. Slats included.", retail: 250, price: 150, category: "bedroom", icon: "fa-bed" },
+            { id: 5, title: "Pair of 2-Drawer Nightstands", desc: "IKEA MALM. Deep drawers hide clutter instantly.", retail: 120, price: 80, category: "bedroom", icon: "fa-bed" },
+            { id: 6, title: "Vertical 6-Drawer Dresser", desc: "IKEA MALM. Maximizes storage vertically.", retail: 199, price: 130, category: "storage", icon: "fa-box" },
+            { id: 7, title: "Premium Solid Wood Media Console", desc: "IKEA HEMNES. Anchors living space with sophisticated vibe.", retail: 249, price: 150, category: "living", icon: "fa-tv" },
+            { id: 8, title: "Set of 4 X-Back Counter Stools", desc: "IKEA ROSENTORP. Includes cushions (one is faded).", retail: 290, price: 160, category: "dining", icon: "fa-chair" },
+            { id: 9, title: "Illuminated Display Console", desc: "IKEA KALLAX with custom LED spotlights and doors.", retail: 250, price: 150, category: "living", icon: "fa-border-all" },
+            { id: 10, title: "Expandable Executive Daybed", desc: "IKEA FLEKKE. Twin lounger pulls out into double bed.", retail: 379, price: 200, category: "bedroom", icon: "fa-bed" },
+            { id: 11, title: "Sleek Minimalist Bed Frame", desc: "IKEA MALM Black-Brown. Slats included.", retail: 300, price: 150, category: "bedroom", icon: "fa-bed" },
+            { id: 12, title: "5-Piece Outdoor Patio Set", desc: "Mainstays Arlington Glen. 2 chairs, 2 footrests, 1 table.", retail: 249, price: 150, category: "outdoor", icon: "fa-sun" }
+        ];
+
+        let selectedTotal = 0;
+        const catalogEl = document.getElementById('catalog');
+        const totalEl = document.getElementById('totalPrice');
+        const searchInput = document.getElementById('searchInput');
+        const catBtns = document.querySelectorAll('.cat-btn');
+
+        function renderCatalog(filterText = "", category = "all") {
+            catalogEl.innerHTML = "";
+            let filtered = furnitureData.filter(item => {
+                const matchesSearch = item.title.toLowerCase().includes(filterText.toLowerCase()) || 
+                                      item.desc.toLowerCase().includes(filterText.toLowerCase());
+                const matchesCategory = category === "all" || item.category === category;
+                return matchesSearch && matchesCategory;
+            });
+
+            if(filtered.length === 0) {
+                catalogEl.innerHTML = "<p style='grid-column: 1/-1; text-align:center;'>No furniture found matching your criteria.</p>";
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-placeholder">
+                        <i class="fas ${item.icon}"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3 class="card-title">${item.title}</h3>
+                        <div class="card-retail">Retail: ~$${item.retail}</div>
+                        <div class="card-price">$${item.price}</div>
+                        <div class="card-desc">${item.desc}</div>
+                        <button class="add-btn" data-price="${item.price}" onclick="toggleCart(this, ${item.price})">
+                            <i class="fas fa-plus"></i> Add to Total
+                        </button>
+                    </div>
+                `;
+                catalogEl.appendChild(card);
+            });
+        }
+
+        window.toggleCart = function(btn, price) {
+            if(btn.classList.contains('added')) {
+                btn.classList.remove('added');
+                btn.innerHTML = '<i class="fas fa-plus"></i> Add to Total';
+                selectedTotal -= price;
+            } else {
+                btn.classList.add('added');
+                btn.innerHTML = '<i class="fas fa-check"></i> Added';
+                selectedTotal += price;
+            }
+            totalEl.innerText = selectedTotal;
+        }
+
+        // Search Listener
+        searchInput.addEventListener('input', (e) => {
+            const activeCat = document.querySelector('.cat-btn.active').dataset.category;
+            renderCatalog(e.target.value, activeCat);
+        });
+
+        // Category Listeners
+        catBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                catBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderCatalog(searchInput.value, btn.dataset.category);
+            });
+        });
+
+        // Initial Render
+        renderCatalog();
+    </script>
+</body>
+</html>
